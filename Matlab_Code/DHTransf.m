@@ -4,7 +4,8 @@ function A = DHTransf( p )
 
 % Check if it is a rotational or translational joint and add offset
 % symbolically.
-q=symvar(p);        %get symbolic variable from p
+% q=symvar(p);%get symbolic variable from p
+
 if ~isempty(symvar(p(2)))  %if it is a rotational joint
     p(2)=p(2)+p(5);  %add offset to v
 else
