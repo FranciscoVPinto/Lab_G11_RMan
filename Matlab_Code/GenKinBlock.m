@@ -15,19 +15,31 @@ P_tool = A06(1:3,4);
 % JACOB
 
 syms q1 q2 q3 q4 q5 q6 real
+assume([q1 q2 q3 q4 q5 q6], 'real');
 
-Jp = [diff(P_tool,q1), diff(P_tool,q2), diff(P_tool,q3), diff(P_tool,q4), diff(P_tool,q5), diff(P_tool,q6)];
+% Posição da tool final
+A06 = DKin(DH);
+P_e = A06(1:3,4);
 
-Z00 = [0;0;1];
-A01 = DKin(DH(1,:));     Z01 = A01(1:3,3);
-A02 = DKin(DH(1:2,:));   Z02 = A02(1:3,3);
-A03 = DKin(DH(1:3,:));   Z03 = A03(1:3,3);
-A04 = DKin(DH(1:4,:));   Z04 = A04(1:3,3);
-A05 = DKin(DH(1:5,:));   Z05 = A05(1:3,3);
+% Inicialização - linear e angular
+Jp = sym(zeros(3,6));
+Jo = sym(zeros(3,6));
 
-Jo = [Z00, Z01, Z02, Z03, Z04, Z05];
+for i = 1:6
+    A_prev = eye(4);
+    if i > 1
+        A_prev = DKin(DH(1:i-1,:));
+    end
 
-J = simplify([Jp; Jo]);
+    Z = A_prev(1:3,3);
+    P = A_prev(1:3,4);
+
+    Jp(:,i) = simplify(cross(Z, P_e - P));
+    Jo(:,i) = Z;
+end
+
+J = [Jp; Jo];  % Jacobiana geométrica
+
 
 %-------------------------------------------------------------------------------------------------
 
